@@ -1,5 +1,5 @@
 [
-	{ "keys": ["escape"], "command": "exit_insert_mode",
+	{ "keys": ["ctrl+v"], "command": "exit_insert_mode",
 		"context":
 		[
 			{ "key": "setting.command_mode", "operand": false },
@@ -7,7 +7,7 @@
 		]
 	},
 
-	{ "keys": ["escape"], "command": "exit_visual_mode",
+	{ "keys": ["ctrl+v"], "command": "exit_visual_mode",
 		"context":
 		[
 			{ "key": "setting.command_mode"},
@@ -16,13 +16,13 @@
 		]
 	},
 
-	{ "keys": ["escape"], "command": "hide_auto_complete", "context":
+	{ "keys": ["ctrl+v"], "command": "hide_auto_complete", "context":
 		[
 			{ "key": "auto_complete_visible", "operator": "equal", "operand": true }
 		]
 	},
 
-	{ "keys": ["escape"], "command": "vi_cancel_current_action", "context":
+	{ "keys": ["ctrl+v"], "command": "vi_cancel_current_action", "context":
 		[
 			{ "key": "setting.command_mode" },
 			{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": false },
@@ -64,7 +64,7 @@
 
 	{ "keys": ["Z", "Z"], "command" : "vi_save_and_exit", "context": [{"key": "setting.command_mode"}] },
 
-	{ "keys": ["i"], "command": "enter_insert_mode",
+	{ "keys": ["ctrl+v"], "command": "enter_insert_mode",
 	  "context":
 	  [
 			{"key": "setting.command_mode"},
@@ -597,24 +597,80 @@
 		"context": [{"key": "setting.command_mode"}]
 	},
 
-	{ "keys": ["h"], "command": "set_motion", "args": {
+	{ "keys": ["ctrl+l"], "command": "set_motion", "args": {
+		"motion": "vi_move_to_hard_eol",
+		"motion_args": {"repeat": 1, "extend": true},
+		"inclusive": true,
+		"clip_to_line": true },
+		"context": [{"key": "setting.command_mode"}]
+	},
+
+	{ "keys": ["ctrl+l"], "command": "set_motion", "args": {
+		"motion": "vi_move_by_characters_in_line",
+		"motion_args": {"forward": true, "extend": true, "visual": false }},
+		"context": [{"key": "setting.command_mode", "operand": false}]
+	},
+
+	{ "keys": ["j"], "command": "set_motion", "args": {
 		"motion": "vi_move_by_characters_in_line",
 		"motion_args": {"forward": false, "extend": true }},
 		"context": [{"key": "setting.command_mode"}]
 	},
 
-	{ "keys": ["j"], "command": "set_motion", "args": {
+	{ "keys": ["ctrl+j"], "command": "set_motion", "args": {
+		"motion": "move_to",
+		"motion_args": {"to": "hardbol", "extend": true }},
+		"context":
+		[
+			{"key": "setting.command_mode"},
+			{"key": "vi_has_repeat_digit", "operand": false}
+		]
+	},
+
+	{ "keys": ["ctrl+j"], "command": "set_motion", "args": {
+		"motion": "vi_move_by_characters_in_line",
+		"motion_args": {"forward": false, "extend": true }},
+		"context": [{"key": "setting.command_mode", "operand": false}]
+	},
+
+	{ "keys": ["k"], "command": "set_motion", "args": {
 		"motion": "move",
 		"motion_args": {"by": "lines", "forward": true, "extend": true },
 		"linewise": true },
 		"context": [{"key": "setting.command_mode"}]
 	},
 
-	{ "keys": ["k"], "command": "set_motion", "args": {
+	{ "keys": ["ctrl+k"], "command": "set_motion", "args": {
+		"motion": "move",
+		"motion_args": {"by": "pages", "forward": true, "extend": true }},
+		"context": [{"key": "setting.command_mode"}, {"key": "setting.vintage_ctrl_keys"}]
+	},
+
+	{ "keys": ["ctrl+k"], "command": "set_motion", "args": {
+		"motion": "move",
+		"motion_args": {"by": "lines", "forward": true, "extend": true },
+		"linewise": true },
+		"context": [{"key": "setting.command_mode", "operand": false}]
+	},
+
+	{ "keys": ["i"], "command": "set_motion", "args": {
 		"motion": "move",
 		"motion_args": {"by": "lines", "forward": false, "extend": true },
 		"linewise": true },
-		"context": [{"key": "setting.command_mode"}]
+		"context": [{"key": "setting.command_mode"}]	
+	},
+
+	{ "keys": ["ctrl+i"], "command": "set_motion", "args": {
+		"motion": "move",
+		"motion_args": {"by": "pages", "forward": false, "extend": true }},
+		"context": [{"key": "setting.command_mode"}, {"key": "setting.vintage_ctrl_keys"}]
+	},
+
+	{ "keys": ["ctrl+i"], "command": "set_motion", "args": {
+		"motion": "move",
+		"motion_args": {"by": "lines", "forward": false, "extend": true },
+		"linewise": true },
+		"context": [{"key": "setting.command_mode", "operand": false}]	
 	},
 
 	{ "keys": ["G"], "command": "set_motion", "args": {
