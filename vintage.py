@@ -1,5 +1,6 @@
 import sublime, sublime_plugin
 import os.path
+import traceback
 
 # Normal: Motions apply to all the characters they select
 MOTION_MODE_NORMAL = 0
@@ -242,7 +243,7 @@ class PushRepeatDigit(sublime_plugin.TextCommand):
 class SetAction(sublime_plugin.TextCommand):
     # Custom version of run_, so an edit object isn't created. This allows
     # eval_input() to add the desired command to the undo stack
-    def run_(self, args):
+    def run_(self, edit_token, args):
         if 'event' in args:
             del args['event']
 
@@ -277,7 +278,7 @@ def digits_to_number(digits):
 class SetMotion(sublime_plugin.TextCommand):
     # Custom version of run_, so an edit object isn't created. This allows
     # eval_input() to add the desired command to the undo stack
-    def run_(self, args):
+    def run_(self, edit_token, args):
         return self.run(**args)
 
     def run(self, motion, motion_args = {}, linewise = False, inclusive = False,
@@ -304,7 +305,7 @@ class SetMotion(sublime_plugin.TextCommand):
             if m != -1:
                 set_motion_mode(self.view, m)
             else:
-                print "invalid motion mode:", mode
+                print("invalid motion mode:", mode)
 
         eval_input(self.view)
 
@@ -313,7 +314,7 @@ class SetMotion(sublime_plugin.TextCommand):
 class SetActionMotion(sublime_plugin.TextCommand):
     # Custom version of run_, so an edit object isn't created. This allows
     # eval_input() to add the desired command to the undo stack
-    def run_(self, args):
+    def run_(self, edit_token, args):
         return self.run(**args)
 
     def run(self, motion, action, motion_args = {}, motion_clip_to_line = False,
@@ -334,7 +335,7 @@ class SetActionMotion(sublime_plugin.TextCommand):
 
 # Update the current motion mode. e.g., 'dvj'
 class SetMotionMode(sublime_plugin.TextCommand):
-    def run_(self, args):
+    def run_(self, edit_token, args):
         if 'event' in args:
             del args['event']
 
@@ -348,10 +349,10 @@ class SetMotionMode(sublime_plugin.TextCommand):
             set_motion_mode(self.view, m)
             g_input_state.motion_mode_overridden = True
         else:
-            print "invalid motion mode"
+            print("invalid motion mode")
 
 class SetRegister(sublime_plugin.TextCommand):
-    def run_(self, args):
+    def run_(self, edit_token, args):
         return self.run(**args)
 
     def run(self, character):
@@ -466,7 +467,7 @@ def clip_empty_selection_to_line_contents(view):
         if s.empty():
             l = view.line(s.b)
             if s.b == l.b and not l.empty():
-                s = sublime.Region(l.b - 1, l.b - 1, s.xpos())
+                s = sublime.Region(l.b - 1, l.b - 1, s.xpos)
 
         new_sel.append(s)
 
@@ -476,12 +477,12 @@ def clip_empty_selection_to_line_contents(view):
 
 def shrink_inclusive(r):
     if r.a < r.b:
-        return sublime.Region(r.b - 1, r.b - 1, r.xpos())
+        return sublime.Region(r.b - 1, r.b - 1, r.xpos)
     else:
-        return sublime.Region(r.b, r.b, r.xpos())
+        return sublime.Region(r.b, r.b, r.xpos)
 
 def shrink_exclusive(r):
-    return sublime.Region(r.b, r.b, r.xpos())
+    return sublime.Region(r.b, r.b, r.xpos)
 
 def shrink_to_first_char(r):
     if r.b < r.a:
@@ -498,10 +499,10 @@ def shrink_to_first_char(r):
 # other than what's passed on its arguments. This allows it to operate correctly
 # in macros, and when running via repeat.
 class ViEval(sublime_plugin.TextCommand):
-    def run_(self, args):
+    def run_(self, edit_token, args):
         was_visual = self.view.has_non_empty_selection_region()
 
-        edit = self.view.begin_edit(self.name(), args)
+        edit = self.view.begin_edit(edit_token, self.name(), args)
         try:
             self.run(edit, **args)
         finally:
@@ -560,7 +561,7 @@ class ViEval(sublime_plugin.TextCommand):
         if motion_args and 'visual' in motion_args:
             motion_args['visual'] = visual_mode
 
-        for i in xrange(prefix_repeat):
+        for i in range(prefix_repeat):
             # Run the motion command, extending the selection to the range of
             # characters covered by the motion
             if motion_command:
@@ -572,7 +573,7 @@ class ViEval(sublime_plugin.TextCommand):
                     else:
                         direction = -1
 
-                for j in xrange(motion_repeat):
+                for j in range(motion_repeat):
                     if direction != 0 and motion_mode == MOTION_MODE_LINE:
                         # Ensure selections encompassing a single line are
                         # oriented in the same way as the motion, so they'll
@@ -592,7 +593,7 @@ class ViEval(sublime_plugin.TextCommand):
                         # they're on, and to start from the RHS of the
                         # character
                         transform_selection_regions(self.view,
-                            lambda r: sublime.Region(r.b, r.b + 1, r.xpos()) if r.empty() else r)
+                            lambda r: sublime.Region(r.b, r.b + 1, r.xpos) if r.empty() else r)
 
                     self.view.run_command(motion_command, motion_args)
 
@@ -642,13 +643,14 @@ class ViEval(sublime_plugin.TextCommand):
 class EnterInsertMode(sublime_plugin.TextCommand):
     # Ensure no undo group is created: the only entry on the undo stack should
     # be the insert_command, if any
-    def run_(self, args):
+    def run_(self, edit_token, args):
         if args:
             return self.run(**args)
         else:
             return self.run()
 
     def run(self, insert_command = None, insert_args = {}, register = '"'):
+        print("EnterInsertMode")
         # mark_undo_groups_for_gluing allows all commands run while in insert
         # mode to comprise a single undo group, which is important for '.' to
         # work as desired.
@@ -663,18 +665,22 @@ class EnterInsertMode(sublime_plugin.TextCommand):
         update_status_line(self.view)
 
 class ExitInsertMode(sublime_plugin.TextCommand):
-    def run_(self, args):
-        edit = self.view.begin_edit(self.name(), args)
+
+    def run_(self, edit_token, args):
+        edit = self.view.begin_edit(edit_token, self.name(), args)
         try:
             self.run(edit)
+            pass
         finally:
             self.view.end_edit(edit)
+            pass
 
         # Call after end_edit(), to ensure the final entry in the glued undo
         # group is 'exit_insert_mode'.
         self.view.run_command('glue_marked_undo_groups')
 
     def run(self, edit):
+        print("ExitInsertMode")
         self.view.settings().set('command_mode', True)
         self.view.settings().set('inverse_caret_state', True)
 
@@ -685,6 +691,7 @@ class ExitInsertMode(sublime_plugin.TextCommand):
 
 class EnterVisualMode(sublime_plugin.TextCommand):
     def run(self, edit):
+        print("EnterVisualMode")
         self.view.run_command('mark_undo_groups_for_gluing')
         if g_input_state.motion_mode != MOTION_MODE_NORMAL:
             set_motion_mode(self.view, MOTION_MODE_NORMAL)
@@ -693,6 +700,7 @@ class EnterVisualMode(sublime_plugin.TextCommand):
 
 class ExitVisualMode(sublime_plugin.TextCommand):
     def run(self, edit, toggle = False):
+        print("ExitVisualMode")
         if toggle:
             if g_input_state.motion_mode != MOTION_MODE_NORMAL:
                 set_motion_mode(self.view, MOTION_MODE_NORMAL)
@@ -789,7 +797,7 @@ class ViCopy(sublime_plugin.TextCommand):
 class ViPrefixableCommand(sublime_plugin.TextCommand):
     # Ensure register and repeat are picked up from g_input_state, and that
     # it'll be recorded on the undo stack
-    def run_(self, args):
+    def run_(self, edit_token, args):
         if not args:
             args = {}
 
@@ -804,7 +812,7 @@ class ViPrefixableCommand(sublime_plugin.TextCommand):
         if 'event' in args:
             del args['event']
 
-        edit = self.view.begin_edit(self.name(), args)
+        edit = self.view.begin_edit(edit_token, self.name(), args)
         try:
             return self.run(edit, **args)
         finally:
