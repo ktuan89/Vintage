@@ -39,6 +39,12 @@ class ViOpenFileUnderSelectionCommand(sublime_plugin.TextCommand):
                                     file_name)
         if os.path.exists(file_name):
             self.view.window().open_file(file_name)
+
+class CopyCurrentWord(sublime_plugin.TextCommand):
+    def run(self, edit):
+        for region in self.view.sel():
+            if region.empty():
+                sublime.set_clipboard(self.view.substr(self.view.word(region.begin())))
             
 class ViSaveAndExit(sublime_plugin.WindowCommand):
     def run(self):

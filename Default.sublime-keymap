@@ -1,4 +1,11 @@
 [
+	{
+		"keys": ["ctrl+c"], "command": "copy_current_word",
+		"context":
+		[
+		]
+	},
+
 	{ "keys": ["ctrl+v"], "command": "exit_insert_mode",
 		"context":
 		[
