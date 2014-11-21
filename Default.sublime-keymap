@@ -6,6 +6,11 @@
 		]
 	},
 
+	{
+		"keys": ["ctrl+o"], "command": "open_file_in_xcode",
+		"context": []
+	},
+
 	{ "keys": ["ctrl+v"], "command": "exit_insert_mode",
 		"context":
 		[
@@ -635,9 +640,10 @@
 	},
 
 	{ "keys": ["ctrl+j"], "command": "set_motion", "args": {
-		"motion": "vi_move_by_characters_in_line",
-		"motion_args": {"forward": false, "extend": true }},
-		"context": [{"key": "setting.command_mode", "operand": false}]
+		"motion": "vi_move_to_first_non_white_space_character",
+		"motion_args": {"extend": true },
+		"clip_to_line": true },
+		"context": [{"key": "setting.command_mode"}]
 	},
 
 	{ "keys": ["k"], "command": "set_motion", "args": {
@@ -664,7 +670,7 @@
 		"motion": "move",
 		"motion_args": {"by": "lines", "forward": false, "extend": true },
 		"linewise": true },
-		"context": [{"key": "setting.command_mode"}]	
+		"context": [{"key": "setting.command_mode"}]
 	},
 
 	{ "keys": ["ctrl+i"], "command": "set_motion", "args": {
@@ -677,7 +683,7 @@
 		"motion": "move",
 		"motion_args": {"by": "lines", "forward": false, "extend": true },
 		"linewise": true },
-		"context": [{"key": "setting.command_mode", "operand": false}]	
+		"context": [{"key": "setting.command_mode", "operand": false}]
 	},
 
 	{ "keys": ["G"], "command": "set_motion", "args": {

@@ -1,5 +1,6 @@
 import sublime, sublime_plugin
 import os
+#import subprocess
 
 def is_legal_path_char(c):
     # XXX make this platform-specific?
@@ -45,7 +46,14 @@ class CopyCurrentWord(sublime_plugin.TextCommand):
         for region in self.view.sel():
             if region.empty():
                 sublime.set_clipboard(self.view.substr(self.view.word(region.begin())))
-            
+
+class OpenFileInXcode(sublime_plugin.TextCommand):
+    def run(self, edit):
+        if self.view.file_name() is not None:
+            #print self.view.file_name()
+            #subprocess.call(["open", "-a", "/Applications/Xcode.app", self.view.file_name()])
+            os.system("open -a /Applications/Xcode.app '" + self.view.file_name() + "'")
+
 class ViSaveAndExit(sublime_plugin.WindowCommand):
     def run(self):
         self.window.run_command('save')
