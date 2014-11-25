@@ -17,8 +17,9 @@ def move_while_path_character(view, start, is_at_boundary, increment=1):
 
 class ViOpenFileUnderSelectionCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        sel = self.view.sel()[0]
-        if not sel.empty():
+        #sel = self.view.sel()[0]
+        region = self.view.sel()[0]
+        """if not sel.empty():
             file_name = self.view.substr(sel)
         else:
             caret_pos = self.view.sel()[0].begin()
@@ -34,10 +35,20 @@ class ViOpenFileUnderSelectionCommand(sublime_plugin.TextCommand):
                                             caret_pos,
                                             lambda x: x > current_line.end(),
                                             increment=1)
-            file_name = self.view.substr(sublime.Region(left + 1, right))
+            file_name = self.view.substr(sublime.Region(left + 1, right))"""
 
-        file_name = os.path.join(os.path.dirname(self.view.file_name()),
-                                    file_name)
+        if region.empty():
+            line = self.view.line(region)
+            file_name = self.view.substr(line)
+        else:
+            file_name = self.view.substr(region)
+
+        """file_name = os.path.join(os.path.dirname(self.view.file_name()),
+                                    file_name)"""
+
+        if file_name.endswith(":"):
+            file_name = file_name[0:-1]
+
         if os.path.exists(file_name):
             self.view.window().open_file(file_name)
 
@@ -60,3 +71,8 @@ class ViSaveAndExit(sublime_plugin.WindowCommand):
         self.window.run_command('close')
         if len(self.window.views()) == 0:
             self.window.run_command('close')
+
+
+#class MoveFocusedViewToBeginning(sublime_plugin.EventListener):
+#    def on_activated(self, view):
+#        view.window().set_view_index(view, 0, 0)

@@ -630,13 +630,9 @@
 	},
 
 	{ "keys": ["ctrl+j"], "command": "set_motion", "args": {
-		"motion": "move_to",
-		"motion_args": {"to": "hardbol", "extend": true }},
-		"context":
-		[
-			{"key": "setting.command_mode"},
-			{"key": "vi_has_repeat_digit", "operand": false}
-		]
+		"motion": "vi_move_by_characters_in_line",
+        "motion_args": {"forward": false, "extend": true }},
+        "context": [{"key": "setting.command_mode", "operand": false}]
 	},
 
 	{ "keys": ["ctrl+j"], "command": "set_motion", "args": {
