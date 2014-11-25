@@ -116,5 +116,7 @@
         "motion_args": {"to": "eof", "extend": true},
         "inclusive": true },
         "context": [{"key": "setting.command_mode"}]
-    }
+    },
+
+    { "keys": ["super+shift+o"], "command": "extended_switcher_haha", "args": {"list_mode": "window"} }
 ]
